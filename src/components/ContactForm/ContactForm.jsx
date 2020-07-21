@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import contactsActions from '../../redux/contacts/contactsActions';
 import styles from '../../styles/Phonebook.module.css';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 class ContactForm extends Component {
   state = {
@@ -7,12 +11,24 @@ class ContactForm extends Component {
     number: '',
   };
 
+  notify = message => toast.warn(message);
+
   handleSubmit = e => {
     e.preventDefault();
-    if (e.target.elements.name.value === '') {
+    console.log(e.target.elements.number.value);
+    if (
+      e.target.elements.name.value === '' ||
+      e.target.elements.number.value === ''
+    ) {
+      this.notify('Not all data entered !');
       return;
     }
-    this.props.onAdd(this.state);
+    const { contacts } = this.props;
+    if (contacts.some(contact => contact.name === this.state.name)) {
+      this.notify(`"${this.state.name}" is already in contacts !`);
+      return;
+    }
+    this.props.onAddContact(this.state);
     this.setState({
       name: '',
       number: '',
@@ -53,4 +69,12 @@ class ContactForm extends Component {
   }
 }
 
-export default ContactForm;
+const mapStateToProps = state => ({
+  contacts: state.contacts.items,
+});
+
+const mapDispatchToProps = {
+  onAddContact: contactsActions.addContact,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactForm);

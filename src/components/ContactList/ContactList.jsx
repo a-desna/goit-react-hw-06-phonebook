@@ -1,35 +1,37 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import ContactItem from '../ContactItem/ContactItem';
 import styles from '../../styles/Phonebook.module.css';
 
-class ContactList extends Component {
-  static propTypes = {
-    contacts: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string,
-        name: PropTypes.string,
-        number: PropTypes.string,
-      }),
-    ).isRequired,
-    onDelete: PropTypes.func.isRequired,
-  };
-
-  render() {
-    const { contacts, onDelete } = this.props;
-    return (
-      <ul className={styles.list}>
-        {contacts.map(({ id, name, number }) => (
-          <ContactItem
-            key={id}
-            name={name}
-            number={number}
-            onDelete={() => onDelete(id)}
-          />
-        ))}
-      </ul>
-    );
-  }
+function ContactList({ contacts }) {
+  return (
+    <ul className={styles.list}>
+      {contacts.map(({ id }) => (
+        <ContactItem key={id} id={id} />
+      ))}
+    </ul>
+  );
 }
 
-export default ContactList;
+ContactList.propTypes = {
+  contacts: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      number: PropTypes.string,
+    }),
+  ).isRequired,
+};
+
+const mapStateToProps = state => {
+  const { items, filter } = state.contacts;
+  const filteredContacts = items.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase()),
+  );
+  return {
+    contacts: filteredContacts,
+  };
+};
+
+export default connect(mapStateToProps)(ContactList);
