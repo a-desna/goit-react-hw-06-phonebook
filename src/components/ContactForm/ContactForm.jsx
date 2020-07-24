@@ -15,7 +15,6 @@ class ContactForm extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    console.log(e.target.elements.number.value);
     if (
       e.target.elements.name.value === '' ||
       e.target.elements.number.value === ''
